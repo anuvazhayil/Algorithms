@@ -83,21 +83,21 @@ int search(Node *head, int val){
             return pos;
         else{
             head = head->next;
-            --pos;
+            ++pos;
         }
     }
     return 0;
 }
 
-/*void reverseRec(Node **head){
-    Node *temp = *head;
-    if(temp->next == NULL){
-        *head = temp;
+void reverseRec(Node *p, Node **head){
+    if(p->next == NULL){
+        *head = p;
         return;
     }
-    reverseRec(&(temp->next));
-    temp->next->next = temp;
-}*/
+    reverseRec(p->next, head);
+    p->next->next = p;
+    p->next = NULL;
+}
 
 void reverseItr(Node **head){
     Node *prev = NULL;
@@ -125,7 +125,6 @@ void print(Node *head){
 void printRev(Node *head){
     if(head == NULL)
         return;
-    cout<<"\n";
     printRev(head->next);
     cout<<head->data<<" ";
 }
@@ -180,9 +179,10 @@ int main(){
     cout<<"\nNumber of elements: "<<count(head);
     reverseItr(&head);
     print(head);
-    //reverseRec(&head);
+    reverseRec(head, &head);
+    print(head);
     printRev(head);
-    int pos = search(head, 22);
+    int pos = search(head, 10);
     if(pos){
         cout<<"\nElement found at: "<<pos;
     }

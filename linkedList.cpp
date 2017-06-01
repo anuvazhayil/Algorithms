@@ -1,164 +1,194 @@
 #include<bits/stdc++.h>
-
+    
 using namespace std;
 
 struct Node{
     int data;
-    Node* next;
-}*start;
-
-class linkedList{
-    public:
-    Node* create(int value);
-    void insertbeg(int value);
-    void insertlast(int value);
-    void insertpos(int value, int pos);
-    void deletebeg();
-    void deletelast();
-    void search(int value);
-    void print();
+    Node *next;
 };
 
-Node* linkedList::create(int value){
-    Node* newNode = (Node*) malloc(sizeof(Node));
-    if(newNode){
-        newNode->data = value;
-        newNode->next = NULL;
+void insertBeg(Node **head, int val){
+    Node *newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = val;
+    newNode->next = NULL;
+    if(*head == NULL){
+        *head = newNode;
+        return;
     }
-    else
-        cout<<"Memory not allocated";
-    return newNode;
+    newNode->next = *head;
+    *head = newNode;
 }
 
-void linkedList::insertbeg(int value){
-    Node *newNode, *temp;
-    newNode = create(value);
-    if(start == NULL){
-        start = newNode;
+void insertEnd(Node **head, int val){
+    Node *newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = val;
+    newNode->next = NULL;
+    if(*head == NULL){
+       *head = newNode;
+       return;
     }
-    else{
-        temp = start;
-        start = newNode;
-        start->next = temp;
-    }
-}
-
-void linkedList::insertlast(int value){
-    Node *newNode, *temp;
-    newNode = create(value);
-    if(start == NULL){
-        start = newNode;
-    }
-    else{
-        temp = start;
-        while(temp->next != NULL){
-            temp = temp->next;
-        }
-        temp->next = newNode;
-    }
-}
-
-void linkedList::insertpos(int value, int pos){
-    Node *newNode, *temp, *ptr;
-    int count = 0;
-    newNode = create(value);
-    temp = start;
-    while(temp != NULL){
-        temp = temp->next;
-        count++;
-    }
-    if(pos == 1){
-        if(start == NULL){
-            start = newNode;
-            start->next = NULL;
-        }
-        else{
-            temp = start;
-            start = newNode;
-            start->next = temp;
-        }
-    }
-    else if(pos > 1 && pos <= count){
-        temp = start;
-        for(int i = 1; i < pos; i++){
-            ptr = temp;
-            temp = temp->next;
-        }
-        ptr->next = newNode;
-        newNode->next = temp;
-    }
-    else{
-        cout<<"Position out of range\n";
-    }
-}
-
-void linkedList::deletebeg(){
-    Node *temp;
-    if(!start){
-        cout<<"Empty list\n";
-    }
-    else{
-        start = start->next;
-    }
-}
-
-void linkedList::deletelast(){
-    Node *temp, *ptr;
-    if(start){
-        temp = start;
-        while(temp->next != NULL){
-            ptr = temp;
-            temp = temp->next;
-        }
-        ptr->next = NULL;
-    }
-}
-
-void linkedList::search(int value){
-    Node *temp; int flag = 0;
-    if(!start){
-        cout<<"List empty\n";
-    }
-    temp = start;
+    Node *temp = *head;
     while(temp->next != NULL){
-        if(temp->data == value){
-            cout<<"Found!";
-            flag = 1;
-            break;
-        }
-        else{
-            temp = temp->next;
-        }
-    }
-    if(flag == 0)
-        cout<<"Not Found!\n";
-}
-
-void linkedList::print(){
-    Node* temp;
-    temp = start;
-    while(temp->next != NULL){
-        cout<<temp->data<<"-->";
         temp = temp->next;
     }
-    cout<<temp->data<<"\n";
+    
+    temp->next = newNode;
 }
 
-int main(){
-    linkedList list;
-    start = NULL;
-    list.insertbeg(2);
-    list.insertbeg(4);
-    list.print();
-    list.insertlast(1);
-    list.insertpos(3,2);
-    list.print();
-    list.search(2);
-    list.search(5);
-    list.deletebeg();
-    list.print();
-    list.deletelast();
-    list.print();
+void insertPos(Node **head, int pos, int val){
+    Node *newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = val;
+    newNode->next = NULL;
+    Node *temp = *head;
+    while(pos-2){
+        temp = temp->next;
+        --pos;
+    }
+    newNode->next = temp->next;
+    temp->next = newNode;
+}
+
+void deleteBeg(Node **head){
+    Node *temp = *head;
+    *head = (*head)->next;
+    delete(temp);
+}
+
+void deleteEnd(Node **head){
+    Node *temp = *head;
+    Node *prev;
+    while(temp->next != NULL){
+        prev = temp;
+        temp = temp->next;
+    }
+    prev->next = NULL;
+    delete(temp);
+}
+
+void deletePos(Node **head, int pos){
+    Node *temp = *head;
+    while(pos-2){
+        temp = temp->next;
+        pos--;
+    }
+    Node *temp2 = temp->next;
+    temp->next = temp2->next;
+    delete(temp2);
+}
+
+int search(Node *head, int val){
+    int pos = 1;
+    while(head != NULL){
+        if(head->data == val)
+            return pos;
+        else{
+            head = head->next;
+            --pos;
+        }
+    }
     return 0;
 }
 
+/*void reverseRec(Node **head){
+    Node *temp = *head;
+    if(temp->next == NULL){
+        *head = temp;
+        return;
+    }
+    reverseRec(&(temp->next));
+    temp->next->next = temp;
+}*/
+
+void reverseItr(Node **head){
+    Node *prev = NULL;
+    Node *curr = *head;
+    Node *next = (*head)->next;
+    while(next != NULL){
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+        next = curr->next;
+    }
+    curr->next = prev;
+    *head = curr;
+}
+
+void print(Node *head){
+    cout<<"\n";
+    while(head != NULL){
+        cout<<head->data<<" ";
+        head = head->next;
+    }
+    cout<<"\n";
+}
+
+void printRev(Node *head){
+    if(head == NULL)
+        return;
+    cout<<"\n";
+    printRev(head->next);
+    cout<<head->data<<" ";
+}
+
+int firstEle(Node *head){
+    return head->data;    
+}
+
+int lastEle(Node *head){
+    cout<<"\n";
+    Node* prev = head;
+    while(prev->next != NULL){
+        prev = prev->next;
+    }
+    return prev->data;
+}
+
+int count(Node *head){
+    int count = 0;
+    while(head != NULL){
+        head = head->next;
+        count++;
+    }
+    return count;
+}
+
+int main(){
+    Node* head = NULL;
+    
+    insertBeg(&head, 4);
+    print(head);
+    insertBeg(&head, 2);
+    print(head);
+    insertBeg(&head, 1);
+    print(head);
+    insertEnd(&head, 22);
+    print(head);
+    insertEnd(&head, 33);
+    print(head);
+    insertPos(&head, 4, 15);
+    print(head);
+    insertPos(&head, 4, 10);
+    print(head);
+    cout<<"\nFirst element: "<<firstEle(head);
+    cout<<"\nLast element: "<<lastEle(head);
+    deleteBeg(&head);
+    print(head);
+    deleteEnd(&head);
+    print(head);
+    deletePos(&head, 4);
+    print(head);
+    cout<<"\nNumber of elements: "<<count(head);
+    reverseItr(&head);
+    print(head);
+    //reverseRec(&head);
+    printRev(head);
+    int pos = search(head, 22);
+    if(pos){
+        cout<<"\nElement found at: "<<pos;
+    }
+    else{
+        cout<<"\nElement not found!";
+    }
+
+    return 0;
+}

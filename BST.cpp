@@ -156,7 +156,7 @@ void printPostorderItr(treeNode *root){
             }
         }
         //parsing up from left
-        else if(prev = root->left){
+        else if(prev == root->left){
             if(root->right){
                 nodes.push(root->right);
             }
@@ -169,7 +169,6 @@ void printPostorderItr(treeNode *root){
             cout<<root->data<<" ";
             nodes.pop();
         }
-
         prev = root;
     }
 }

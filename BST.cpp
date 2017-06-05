@@ -173,6 +173,25 @@ void printPostorderItr(treeNode *root){
     }
 }
 
+int lowestCommonAncestor(treeNode *root, int p, int q) {
+    treeNode* ancestor = root;
+    while(root){
+        if(root->data > p && root->data > q){
+            ancestor = root->left;
+            root = root->left;
+        }
+        else if(root->data < p && root->data < q){
+            ancestor = root->right;
+            root = root->right;
+        }
+        else{
+            ancestor = root;
+            return ancestor->data;
+        }
+    }
+    return ancestor->data;
+}
+
 /*treeNode* treeNode::inorderPredecessor(treeNode* node){
     if(node == NULL)
         return NULL;
@@ -233,5 +252,6 @@ int main(){
     root = deleteNode(root, 7);
     printPostorderItr(root);
     cout<<"\n";
+    cout<<lowestCommonAncestor(root, 10, 12);
     return 0;
 }

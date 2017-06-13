@@ -2,89 +2,104 @@
 
 using namespace std;
 
+const int ROW_MAX = 4;
+const int COL_MAX = 5;
+
 class Cell{
     public:
     int x, y;
     int val;
     bool visited;
-    Cell parent;
-    Cell(int x, int y, int val, bool visited){
+    Cell *parent;
+    Cell(){
+      this->x = this->y = this->val = 0; this->visited = false; this->parent = NULL;
+    }
+    Cell(int x, int y, int val){
         this->x = x;
         this->y = y;
         this->val = val;
         this->visited = false;
+        this->parent = NULL;
     }
 };
 
 class Maze{
-    Cell maze[][5];
+    Cell **maze;
     public:
-    Maze(int pattern[][5]){
-        int rows = sizeof(pattern)/sizeof(pattern[0]);
-        int cols = sizeof(pattern[0])/sizeof(int);
-        for(int i = 0; i < rows; i++){
-            for(int j = 0; j < cols; j++){
-                Cell *ptr = &maze[i][j].parent;
-                ptr = NULL;
-                maze[i][j] = Cell(i, j, pattern[i][j], false);
 
-            }
-        }
+    Maze(int **pattern){
+        maze = new Cell *[ROW_MAX];
+        for(int i = 0; i < ROW_MAX; i++)
+            maze[i] = new Cell[COL_MAX];
+
+        for(int i = 0; i < ROW_MAX; i++)
+            for(int j = 0; j < COL_MAX; j++)
+                maze[i][j] = Cell(i, j, pattern[i][j]);
     }
 
-    Cell getValue(int x, int y){
-        return maze[x][y];
+    Cell* getValue(int x, int y){
+        return &maze[x][y];
     }
 
-    stack<Cell> showPath(int srcx, int srcy, int destx, int desty, int rows, int cols){
-        queue<Cell>q;
-        stack<Cell>result;
+    Cell* showPath(int srcx, int srcy, int destx, int desty){
+        queue<Cell*>q;
+
         int dx[] = {1, 0, -1, 0};
         int dy[] = {0, -1, 0, 1};
-        Cell src = getValue(srcx, srcy);
-        src.visited = true;
+        Cell *src = getValue(srcx, srcy);
+        src->visited = true;
         q.push(src);
-        Cell curr;
+        Cell *curr;
 
         while(!q.empty()){
             int posx, posy;
             curr = q.front();
             q.pop();
 
-            if(curr.x == destx && curr.y == desty){
+            if(curr->x == destx && curr->y == desty){
                 break;
             }
 
             for(int i = 0; i < 4; i++){
-                posx = curr.x + dx[i];
-                posy = curr.y + dy[i];
-                Cell next = getValue(posx, posy);
-                if(posx >=0 && posx < rows && posy >= 0 && posy < cols && !next.visited && next.val){
-                    next.visited = true;
-                    next.parent = curr;
-                    q.push(next);
+                posx = curr->x + dx[i];
+                posy = curr->y + dy[i];
+
+                if(posx >= 0 && posx < ROW_MAX && posy >= 0 && posy < COL_MAX){
+                    Cell *next = getValue(posx, posy);
+                    if(!next->visited && next->val){
+                        next->visited = true;
+                        next->parent = curr;
+                        q.push(next);
+                    }
                 }
             }
         }
-        while(curr.parent != NULL){
-            result.push(curr);
-            curr = curr.parent;
+        return curr;
+    }
+
+    void printRev(Cell *result){
+        if(!result){
+            return;
         }
-        return result;
+        printRev(result->parent);
+        cout<<" ("<<result->x<<","<<result->y<<")->";
     }
 };
 
 int main(){
-    stack<Cell>result;
-    int pattern[][5] = {{1, 0, 1, 1, 1}, {1, 0, 1, 0, 1}, {1, 0, 1, 0, 1}, {1, 1, 1, 1, 1}};
+    int **pattern;
+    pattern = new int *[ROW_MAX];
+    for(int i = 0; i < ROW_MAX; i++)
+        pattern[i] = new int[COL_MAX];
+
+    int maze_data[][COL_MAX] = {{1, 0, 1, 1, 1}, {1, 0, 1, 0, 1}, {1, 0, 1, 0, 1}, {1, 1, 1, 1, 1}};
+    for(int i = 0; i < ROW_MAX; i++)
+        for(int j = 0; j < COL_MAX; j++)
+            pattern[i][j] = maze_data[i][j];
 
     Maze board(pattern);
-    result = board.showPath(1, 0, 2, 2, 4, 5);
-    while(!result.empty()){
-        Cell ele = result.top();
-        result.pop();
-        cout<<"("<<ele.x<<","<<ele.y<<") ->";
-    }
+    Cell *result = board.showPath(1, 0, 2, 2);
+    board.printRev(result);
     cout<<"Destination Reached!";
     return 0;
 }
